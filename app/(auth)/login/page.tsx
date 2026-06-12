@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import React, { useState, FormEvent } from 'react';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -11,7 +11,7 @@ export default function LoginPage() {
   // Novo estado para controlar se a senha está visível
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
