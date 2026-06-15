@@ -1,14 +1,16 @@
 'use client';
 
-import React, { useState, FormEvent } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { cookies } from 'next/dist/server/request/cookies';
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const router = useRouter();
   
-  // Novo estado para controlar se a senha está visível
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
@@ -20,7 +22,28 @@ export default function LoginPage() {
       return;
     }
 
-    console.log('Tentativa de login com:', { email, password });
+    try{
+
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao tentar fazer login. Por favor, tente novamente.');
+      }
+
+      router.push('/dashboard');
+
+      const data = await response.json();
+      (await cookies()).set("token", data.token);
+
+    } catch (error) {
+      setError('Erro ao tentar fazer login. Por favor, tente novamente.');
+    }
   };
 
   return (
@@ -104,12 +127,6 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 flex flex-col items-center space-y-4">
-          <Link 
-            href="#" 
-            className="text-sm text-gray-700 hover:text-[#1e1b4b] underline underline-offset-2 font-medium transition-colors"
-          >
-            Esqueceu sua senha?
-          </Link>
 
           <p className="text-sm text-gray-700">
             Ainda não tem conta?{' '}

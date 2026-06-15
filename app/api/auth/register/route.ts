@@ -23,12 +23,11 @@ export async function POST(request: Request) {
 
     await prisma.user.create({
         data: {
-            name: name,
+            nome: name,
             email: email,
-            password: passHash
+            senhaHash: passHash
         }
     });
 
     return NextResponse.json({message: "Usuário registrado com sucesso"}, {status: 201});
-
 }

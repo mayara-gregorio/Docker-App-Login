@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function RegisterPage() {
@@ -9,10 +9,9 @@ export default function RegisterPage() {
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
   
-  // Estado para controlar a visibilidade da senha
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
-  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     setError('');
 
@@ -27,7 +26,6 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-200 via-blue-50 to-indigo-200 px-4">
       
-      {/* Card com efeito Glassmorphism */}
       <div className="max-w-sm w-full bg-white/40 backdrop-blur-lg border border-white/60 rounded-3xl shadow-[0_8px_30px_rgb(0,0,0,0.12)] p-8">
         
         <h2 className="text-xl font-extrabold text-center text-[#111827] mb-8 tracking-wide">
