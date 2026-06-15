@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: postgres-auth-projeto
+    restart: always
+    environment:
+      POSTGRES_USER: admin_ifma
+      POSTGRES_PASSWORD: senha_secreta_123
+      POSTGRES_DB: db_autenticacao
+    volumes:
+      - dados_projeto_usuarios:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  web:
+    build: .
+    container_name: nextjs-auth-app
+    restart: on-failure
+    ports:
+      - "8000:3000"
+    environment:
+      - DATABASE_URL=postgresql://admin_ifma:senha_secreta_123@db:5432/db_autenticacao?schema=public
+      - JWT_SECRET=uma_chave_longa_e_super_secreta_12938102
+    depends_on:
+      - db
+
+volumes:
+  dados_projeto_usuarios:
