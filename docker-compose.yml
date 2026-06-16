@@ -11,6 +11,11 @@ services:
       - dados_projeto_usuarios:/var/lib/postgresql/data
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin_ifma -d db_autenticacao"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   web:
     build: .
@@ -20,9 +25,10 @@ services:
       - "8000:3000"
     environment:
       - DATABASE_URL=postgresql://admin_ifma:senha_secreta_123@db:5432/db_autenticacao?schema=public
-      - JWT_SECRET=uma_chave_longa_e_super_secreta_12938102
+      - JWT_SECRET=wxwnepiw2b@#@#%#@%DVEVDdjlcbelirvbetxrtcr$$###122456232hvxygdvxyv
     depends_on:
-      - db
+      db:
+        condition: service_healthy
 
 volumes:
   dados_projeto_usuarios:
