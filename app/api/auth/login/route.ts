@@ -19,7 +19,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ message: "Credenciais inválidas" }, { status: 401 });
     }
 
-    const isPasswordValid = await bcrypt.compare(password, user.senhaHash);
+    const isPasswordValid = await bcrypt.compare(password, user.password);
 
     if (!isPasswordValid) {
         return NextResponse.json({ message: "Credenciais inválidas" }, { status: 401 });
