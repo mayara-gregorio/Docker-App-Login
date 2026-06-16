@@ -2,12 +2,14 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function RegisterPage() {
   const [name, setName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [error, setError] = useState<string>('');
+  const router = useRouter();
   
   const [showPassword, setShowPassword] = useState<boolean>(false);
 
@@ -20,7 +22,18 @@ export default function RegisterPage() {
       return;
     }
 
-    console.log('Tentativa de cadastro com:', { name, email, password });
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      setError(errorData.message || 'Erro ao criar conta.');
+    } else {
+      router.replace('/login');
+    }
   };
 
   return (

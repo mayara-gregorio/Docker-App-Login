@@ -5,13 +5,9 @@ import { useRouter } from "next/navigation";
 export default function Dashboard() {
   const router = useRouter();
 
-  function logout() {
-    const response = fetch('/api/auth/logout', {
-      method: 'POST',
-    });
-
-    router.push('/login');
-    
+  async function logout() {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    router.replace('/login');
   }
 
   return (

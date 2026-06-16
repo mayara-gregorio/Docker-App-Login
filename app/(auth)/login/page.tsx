@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { cookies } from 'next/dist/server/request/cookies';
 
 export default function LoginPage() {
   const [email, setEmail] = useState<string>('');
@@ -32,20 +31,16 @@ export default function LoginPage() {
         body: JSON.stringify({ email, password })
       });
 
-      if (!response.ok) {
-        throw new Error('Erro ao tentar fazer login. Por favor, tente novamente.');
+      if (response.ok) {
+        router.replace('/dashboard');
+      } else {
+        const data = await response.json();
+        setError(data.message || 'Credenciais inválidas.');
       }
-
-      router.push('/dashboard');
-
-      const data = await response.json();
-      (await cookies()).set("token", data.token);
-
-    } catch (error) {
-      setError('Erro ao tentar fazer login. Por favor, tente novamente.');
+    } catch (err) {
+      setError('Ocorreu um erro ao tentar fazer login. Tente novamente mais tarde.');
     }
-  };
-
+  }
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-200 via-blue-50 to-indigo-200 px-4">
       
