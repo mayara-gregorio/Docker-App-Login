@@ -1,18 +1,20 @@
+version: '3.8'
+
 services:
   db:
     image: postgres:15-alpine
     container_name: postgres-auth-projeto
     restart: always
     environment:
-      POSTGRES_USER: admin_ifma
-      POSTGRES_PASSWORD: senha_secreta_123
-      POSTGRES_DB: db_autenticacao
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - dados_projeto_usuarios:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U admin_ifma -d db_autenticacao"]
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -23,9 +25,8 @@ services:
     restart: on-failure
     ports:
       - "8000:3000"
-    environment:
-      - DATABASE_URL=postgresql://admin_ifma:senha_secreta_123@db:5432/db_autenticacao?schema=public
-      - JWT_SECRET=wxwnepiw2b@#@#%#@%DVEVDdjlcbelirvbetxrtcr$$###122456232hvxygdvxyv
+    env_file:
+      - .env
     depends_on:
       db:
         condition: service_healthy
