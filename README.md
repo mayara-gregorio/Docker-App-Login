@@ -74,16 +74,14 @@ Abra o navegador em: [http://localhost:8000](http://localhost:8000)
 ```json
 {
   "message": "Usuário criado com sucesso!",
-  "userId": "uuid-gerado"
 }
 ```
 
 **Erros possíveis:**
 | Status | Mensagem |
 |--------|----------|
-| 400 | E-mail e senha são obrigatórios. |
-| 400 | Este e-mail já está cadastrado. |
-| 500 | Erro interno no servidor. |
+| 400 | Ausência de parâmetros. |
+| 400 | Usuário já registrado. |
 
 ---
 
@@ -100,12 +98,7 @@ Abra o navegador em: [http://localhost:8000](http://localhost:8000)
 **Resposta de sucesso (200):**
 ```json
 {
-  "message": "Login efetuado com sucesso!",
-  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "user": {
-    "name": "Aluno IFMA",
-    "email": "aluno@ifma.edu.br"
-  }
+  "message": "Login efetuado com sucesso!"
 }
 ```
 
@@ -113,28 +106,34 @@ Abra o navegador em: [http://localhost:8000](http://localhost:8000)
 | Status | Mensagem |
 |--------|----------|
 | 401 | Credenciais inválidas. |
-| 500 | Erro interno no servidor. |
 
 ---
 
-##  Prova de Fogo — Testando a Persistência dos Dados
+## Prova de Fogo — Testando a Persistência dos Dados
 
-Este teste comprova que o **volume Docker** garante que os dados do banco de dados **não se perdem** ao derrubar os containers.
+Este teste comprova que o volume Docker garante que os dados do banco **não se perdem** ao derrubar os containers.
+
+### 1. Cadastre um usuário
+
+Através da URl http://localhost:8000/register faça o cadastro de um usuário.
+
+### 2. Derrube todos os containers
 
 ```bash
-# 1. Cadastre um usuário (via Postman, Insomnia ou Thunder Client)
-# POST http://localhost:8000/api/auth/register
-
-# 2. Derrube todos os containers
 docker compose down
-
-# 3. Suba novamente do zero
-docker compose up -d
-
-# 4. Tente fazer login com o usuário cadastrado antes
-# POST http://localhost:8000/api/auth/login
-# Se o login funcionar, a persistência está garantida!
 ```
+
+> Não use a flag `-v` aqui. `docker compose down -v` também apagaria o volume nomeado (`dados_projeto_usuarios`), e o teste deixaria de provar o que precisa provar.
+
+### 3. Suba o ambiente de novo, do zero
+
+```bash
+docker compose up -d
+```
+
+### 4. Tente logar com o mesmo usuário
+
+Através da URl http://localhost:8000/login logue com um usuário já criado.
 
 ---
 
@@ -156,30 +155,45 @@ docker compose up -d
 ## Estrutura do Projeto
 
 ```
-projeto-login/
+Docker-App-Login/
+├── app/
+│   ├── (auth)/
+│   │   ├── dashboard/
+│   │   │   └── page.tsx        # Painel protegido (só acessível autenticado)
+│   │   ├── login/
+│   │   │   └── page.tsx        # Tela de login
+│   │   └── register/
+│   │       └── page.tsx        # Tela de cadastro
+│   ├── api/
+│   │   ├── auth/
+│   │   │   ├── login/route.ts     # Verifica credenciais e gera o JWT
+│   │   │   ├── logout/route.ts    # Remove o cookie de sessão
+│   │   │   └── register/route.ts  # Cria o usuário (hash da senha com bcrypt)
+│   │   └── lib/
+│   │       └── prisma.ts          # Instância global do Prisma Client
+│   ├── globals.css
+│   ├── layout.tsx                 # Layout raiz da aplicação
+│   └── page.tsx                   # Página inicial
 ├── prisma/
-│   └── schema.prisma        # Modelo do banco de dados
-├── src/
-│   ├── app/
-│   │   ├── api/
-│   │   │   └── auth/
-│   │   │       ├── register/route.ts  # Rota de cadastro
-│   │   │       └── login/route.ts     # Rota de login
-│   │   └── page.tsx         # Página inicial
-│   └── lib/
-│       └── prisma.ts        # Conexão global com o banco
-├── Dockerfile               # Empacotamento da aplicação
-├── docker-compose.yml       # Orquestração dos containers
-├── .env.example             # Exemplo de variáveis de ambiente
+│   ├── migrations/                # Histórico de migrations do banco
+│   └── schema.prisma               # Modelo de dados (model User)
+├── public/                        # Ícones estáticos padrão do Next.js
+├── .dockerignore
+├── .env                            # Variáveis reais (versionado para testes)
+├── .gitignore
+├── docker-compose.yml              # Orquestração dos containers
+├── Dockerfile                      # Empacotamento da aplicação web
+├── package.json
+├── prisma.config.ts                # Configuração do Prisma (lê DATABASE_URL)
+├── proxy.ts                        # Middleware: protege rotas que exigem login
 └── README.md
 ```
-
 ---
 
 ## Equipe
 
 | Aluno | Responsabilidade |
 |-------|-----------------|
-| Aluno 1 | Backend (API Routes, autenticação, middleware) |
-| Aluno 2 | Frontend (telas de login, cadastro e dashboard) |
-| Aluno 3 | Docker (Dockerfile, docker-compose.yml, README) |
+| Mayara Gregório | Backend (API Routes, autenticação, middleware) |
+| Josué Hudson | Frontend (telas de login, cadastro e dashboard) |
+| Gabriel | Docker (Dockerfile, docker-compose.yml, README) |
