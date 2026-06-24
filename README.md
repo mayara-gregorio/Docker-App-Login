@@ -38,7 +38,7 @@ API de autenticação de usuários construída com **Next.js**, **Prisma ORM** e
 
 ### 1. Clonar o repositório
 ```bash
-git clone [https://github.com/seu-usuario/projeto-login.git](https://github.com/mayara-gregorio/Docker-App-Login.git)
+git clone https://github.com/mayara-gregorio/Docker-App-Login.git
 cd Docker-App-Login
 ```
 
